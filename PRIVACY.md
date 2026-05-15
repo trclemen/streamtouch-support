@@ -1,12 +1,12 @@
 # StreamTouch — Privacy Policy
 
-**Last Updated: May 07, 2026**
+**Last Updated: May 15, 2026**
 
 ---
 
 ## Overview
 
-StreamTouch ("the App") is an iOS controller for Bose SoundTouch speakers 
+StreamTouch ("the App") is an iOS controller for SoundTouch speakers 
 operated via a self-hosted Music Assistant server. We respect your privacy 
 and are committed to protecting it.
 
@@ -20,7 +20,7 @@ and are committed to protecting it.
 StreamTouch collects no personal information. All configuration data is 
 stored locally on your device only, including:
 
-- Bose SoundTouch speaker IP address
+- SoundTouch speaker IP address
 - Music Assistant server IP address, port and player ID
 - API bearer token *(stored securely in the iOS Keychain — see below)*
 - Saved presets and last played track metadata
@@ -36,7 +36,7 @@ local network:
 
 | Destination | Purpose |
 |---|---|
-| Your Bose SoundTouch speaker | Playback control and volume via local Wi-Fi |
+| Your SoundTouch speaker | Playback control and volume via local Wi-Fi |
 | Your Music Assistant server | Search, playback commands and queue management via local Wi-Fi |
 | Artwork image URLs | Album artwork served by your music providers (e.g. Spotify, Tidal, Plex) through your Music Assistant server |
 
@@ -49,7 +49,7 @@ services or any other third party.
 
 iOS will prompt you to grant permission to access your local network when 
 you first launch StreamTouch. This permission is required for the App to 
-connect to your Bose SoundTouch speaker and Music Assistant server.
+connect to your SoundTouch speaker and Music Assistant server.
 
 This permission is used solely for those two local connections and for 
 no other purpose.
