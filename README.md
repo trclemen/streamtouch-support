@@ -1,11 +1,11 @@
 # streamtouch-support
-> Touch Music Control for Bose SoundTouch via Music Assistant
+> Touch Music Control for SoundTouch via Music Assistant
 
 ---
 
 ## What is StreamTouch?
 
-StreamTouch is an iOS app that lets you control your Bose SoundTouch speaker through a self-hosted Music Assistant server, directly from your iPhone or iPad. Search and play music from your connected providers, save presets, and control playback — all from one simple interface.
+StreamTouch is an iOS app that lets you control your SoundTouch speaker through a self-hosted Music Assistant server, directly from your iPhone or iPad. Search and play music from your connected providers, save presets, and control playback — all from one simple interface.
 
 ---
 
@@ -13,7 +13,7 @@ StreamTouch is an iOS app that lets you control your Bose SoundTouch speaker thr
 
 Before using StreamTouch you will need:
 
-- A **Bose SoundTouch** speaker connected to your local network
+- A **SoundTouch** speaker connected to your local network
 - A running instance of **Music Assistant** server (open source, self-hosted)
 - A valid **Music Assistant API bearer token**
 - All devices on the **same local network**
@@ -24,7 +24,7 @@ Before using StreamTouch you will need:
 
 On first launch, StreamTouch will guide you through a step-by-step setup wizard to enter your:
 
-- Bose SoundTouch speaker IP address
+- SoundTouch speaker IP address
 - Music Assistant server IP address and port
 - Music Assistant Player ID
 - API bearer token
@@ -35,10 +35,10 @@ On first launch, StreamTouch will guide you through a step-by-step setup wizard 
 
 ## Frequently Asked Questions
 
-### Where do I find my Bose SoundTouch IP address?
+### Where do I find my SoundTouch IP address?
 Check your router's connected devices list. The speaker will typically appear as "SoundTouch" or similar.
 
-> To assign a static IP to a Bose SoundTouch speaker, use your router's management page to set up a DHCP reservation. The speaker itself does not have a menu for manual IP entry.
+> To assign a static IP to a SoundTouch speaker, use your router's management page to set up a DHCP reservation. The speaker itself does not have a menu for manual IP entry.
 
 ---
 
@@ -50,7 +50,7 @@ You can run the Music Assistant server without Home Assistant by using its offic
 ---
 
 ### Where do I find my Music Assistant Player ID?
-In Music Assistant go to **Settings → Players** and select your Bose SoundTouch player. The Player ID will be shown in the player details and will look similar to `up689e19dada87`.
+In Music Assistant go to **Settings → Players** and select your SoundTouch player. The Player ID will be shown in the player details and will look similar to `up689e19dada87`.
 
 ---
 
@@ -79,7 +79,7 @@ Yes — tap the **gear icon** on the main dashboard at any time to update your s
 
 ### The app is not finding my speaker
 
-- Confirm the Bose SoundTouch speaker is powered on
+- Confirm the SoundTouch speaker is powered on
 - Verify the IP address in settings matches the speaker's current IP
 - Consider assigning a static/reserved IP to your speaker in your router settings to prevent it changing
 
@@ -95,8 +95,8 @@ Yes — tap the **gear icon** on the main dashboard at any time to update your s
 
 ## ⚠️ Caveats, Known Issues & Limitations
 
-**Bose SoundTouch LED/OLED Display**
-For Bose SoundTouch systems with LED/OLED displays, artist and track info is reliably shown when individual tracks or radio stations are played. When playing albums from StreamTouch, the display may only show the first track — this is a known limitation within Music Assistant's Bose SoundTouch player support when using DLNA/UPnP playback and Queue Flow Mode streaming.
+**SoundTouch LED/OLED Display**
+For SoundTouch systems with LED/OLED displays, artist and track info is reliably shown when individual tracks or radio stations are played. When playing albums from StreamTouch, the display may only show the first track — this is a known limitation within Music Assistant's SoundTouch player support when using DLNA/UPnP playback and Queue Flow Mode streaming.
 
 **Album playback only plays first track**
 If StreamTouch only plays the first song when **Play Album** is selected, ensure that **Queue Flow Mode** is enabled in Music Assistant under the SoundTouch Player **Advanced** settings.
