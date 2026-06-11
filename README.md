@@ -296,7 +296,7 @@ The package contains:
 Save the files to a folder on your device, for example:
 - **Raspberry Pi / Linux:** `/home/pi/streamtouch-slc/`
 - **Synology NAS:** `/volume1/docker/streamtouch-slc/`
-- **QNAP NAS:** `/share/streamtouch-slc/`
+- **QNAP NAS:** `/share/CACHEDEV1_DATA/streamtouch-slc/`
 - **Windows:** `C:\streamtouch-slc\`
 
 ---
