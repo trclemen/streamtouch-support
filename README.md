@@ -395,7 +395,6 @@ services:
 ······- SHIM_PORT=8300  
 ······- MA_HOST=192.168.0.x··········# IP of your Music Assistant server   
 ······- MA_PORT=8095  
-······- MA_TOKEN=your_token_here.····# Your Music Assistant bearer token  
 ····volumes:  
 ······- ./data:/data  
 
@@ -403,14 +402,9 @@ services:
 > device running SLC — this is the IP your speaker will
 > use to connect to SLC.
 
-> **MA_HOST and MA_TOKEN** are needed so SLC can resolve
-> radio stream URLs from Music Assistant when a preset
-> button is pressed.
-
-> 🔒 **Security note:** Your docker-compose.yml contains
-> your Music Assistant bearer token. Keep this file on your
-> local device only — do not share it or commit it to any
-> public repository.
+> **MA_HOST** is needed so SLC can resolve radio stream
+> URLs from Music Assistant when a preset button is
+> pressed on your speaker  
 
 Then build and start the container:
 cd /path/to/streamtouch-slc
