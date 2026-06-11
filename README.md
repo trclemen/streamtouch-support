@@ -391,7 +391,7 @@ services:
 ····ports:  
 ······- "8300:8300"  
 ····environment:  
-······- SHIM_HOST=192.168.0.x········# IP of THIS device running SLC  
+······- SHIM_HOST=192.168.0.x········# IP of THIS container/device running SLC  
 ······- SHIM_PORT=8300  
 ······- MA_HOST=192.168.0.x··········# IP of your Music Assistant server   
 ······- MA_PORT=8095  
@@ -399,7 +399,7 @@ services:
 ······- ./data:/data  
 
 > **SHIM_HOST** must be set to the IP address of the
-> device running SLC — this is the IP your speaker will
+> device/container running SLC — this is the IP your speaker will
 > use to connect to SLC.
 
 > **MA_HOST** is needed so SLC can resolve radio stream
