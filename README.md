@@ -2,6 +2,32 @@
 > Touch Music Control for SoundTouch via Music Assistant
 
 ---
+## Contents
+
+- [What is StreamTouch?](#what-is-streamtouch)
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+- [Speaker Management](#speaker-management)
+- [WiFi Reconnection Wizard](#wifi-reconnection-wizard)
+- [Speaker Grouping](#speaker-grouping)
+- [StreamTouch Local Cloud (SLC)](#streamtouch-local-cloud-slc)
+  - [What is SLC?](#what-is-slc)
+  - [Do I need SLC?](#do-i-need-slc)
+  - [How SLC works](#how-slc-works)
+  - [Where Does SLC Need to Be?](#where-does-slc-need-to-be)
+  - [SLC Requirements](#slc-requirements)
+  - [Where to run SLC](#where-to-run-slc)
+  - [Installing SLC](#installing-slc)
+  - [Platform-Specific Network Configuration](#platform-specific-network-configuration)
+  - [Saving a radio station as a hardware preset](#saving-a-radio-station-as-a-hardware-preset)
+  - [Hardware Preset Viewer](#hardware-preset-viewer)
+- [Frequently Asked Questions](#frequently-asked-questions)
+- [Caveats, Known Issues and Limitations](#caveats-known-issues-and-limitations)
+- [Resetting the App](#resetting-the-app)
+- [Privacy](#privacy)
+- [Contact and Support](#contact-and-support)
+
+---
 
 ## What is StreamTouch?
 
@@ -381,6 +407,20 @@ or by setting a static IP on the device itself.
 
 #### Step 4 — Configure and build SLC
 
+#### Platform-Specific Network Configuration
+
+The default docker-compose.yml uses standard port mapping which works on most platforms.  
+However some NAS devices require additional network configuration to give the SLC container a fixed IP address directly on your local network.  
+
+#### Why This Matters
+
+Your speaker communicates directly with SLC over your local network. The key requirement is that SHIM_HOST must be set to whatever IP address 
+the speaker will use to reach SLC — this differs depending on your platform and network setup.  
+
+---
+
+### Raspberry Pi / Linux / Windows / Mac  
+The default docker-compose.yml works without any changes.  
 Edit the `docker-compose.yml` file and set your values:
 
 services:  
@@ -398,24 +438,108 @@ services:
 ····volumes:  
 ······- ./data:/data  
 
-> **SHIM_HOST** must be set to the IP address of the
-> device/container running SLC — this is the IP your speaker will
-> use to connect to SLC.
+On these platforms the container shares the host device IP address. Set SHIM_HOST to the IP address of the device running Docker  
+— for example if your Raspberry Pi is at 192.168.0.100 then SHIM_HOST=192.168.0.100  
 
-> **MA_HOST** is needed so SLC can resolve radio stream
-> URLs from Music Assistant when a preset button is
-> pressed on your speaker  
+---
 
-Then build and start the container:
-cd /path/to/streamtouch-slc
-docker compose up -d --build
+### QNAP NAS
+QNAP uses its own virtual network driver called qnet. This gives each container its own dedicated IP address directly on your local network  
+— completely separate from the NAS IP address itself.
 
-To check it is running:
-docker logs streamtouch-slc
+For example:
 
-You should see:
-StreamTouch UPnP Shim starting...
-Listening: http://192.168.0.x:8300
+QNAP NAS:                192.168.0.252  
+Music Assistant container: 192.168.0.253  
+SLC container:             192.168.0.254  
+
+SHIM_HOST must be set to the container IP assigned via --ip not the NAS IP. The speaker connects to the container IP directly.
+#### Step 1 — Find your QNAP network name
+
+In QNAP Container Station go to Networks and note the name of your static network. It will look similar to:  
+qnet-static-bond0-0fa2ce
+
+The exact name varies by QNAP model and network configuration.
+#### Step 2 — Choose a fixed IP for the SLC container
+Pick an unused IP address on your local network for example 192.168.0.254. This will be the container IP — not the NAS IP. Reserve this in your router using DHCP reservation so nothing else takes it.
+
+#### Step 3 — Build and run using docker run
+QNAP Container Station docker compose support for custom networks can be unreliable. Use docker run directly instead:
+
+cd /share/CACHEDEV1_DATA/streamtouch-slc  
+docker build -t streamtouch-slc:latest .  
+docker stop streamtouch-slc 2>/dev/null.   
+docker rm streamtouch-slc 2>/dev/null  
+docker run -d \  
+  --name streamtouch-slc \
+  --network qnet-static-bond0-0fa2ce \
+  --ip 192.168.0.254 \
+  -e MA_HOST=192.168.0.253 \
+  -e MA_PORT=8095 \
+  -e SHIM_HOST=192.168.0.254 \
+  -e SHIM_PORT=8300 \
+  -e SHIM_UUID=streamtouch-upnp-0000-0000-000000000001 \
+  -v /share/CACHEDEV1_DATA/streamtouch-slc/data:/data \
+  --restart unless-stopped \
+  streamtouch-slc:latest
+
+#### Important:
+
+    --ip and SHIM_HOST must be the same value
+    --ip is the container IP not the NAS IP
+    MA_HOST is the IP of your Music Assistant server
+    Replace qnet-static-bond0-0fa2ce with your actual QNAP network name
+
+---
+
+### Synology NAS
+
+Synology NAS supports two approaches depending on your DSM version and network setup.
+#### Option A — Bridge network with port mapping (simpler)
+In Container Manager create the container using the standard docker-compose.yml with port mapping. This works on most Synology setups and is the recommended starting point.
+
+On Synology with bridge networking the container shares the NAS IP address. Set SHIM_HOST to the IP address of the NAS itself:
+
+environment:
+  - SHIM_HOST=192.168.0.x
+  - SHIM_PORT=8300
+  - MA_HOST=192.168.0.x
+  - MA_PORT=8095
+
+
+  Where 192.168.0.x is your Synology NAS IP address.
+
+#### Option B — Macvlan network with fixed container IP
+If Option A does not work reliably create a macvlan network to give the container its own dedicated LAN IP — similar to how QNAP works.
+
+In Synology Container Manager:
+
+   1. Go to Network then Add
+   2.  Select Macvlan
+   3.  Choose your network interface for example eth0
+   4.  Set a fixed IP for the container for example 192.168.0.254
+   5.  Use this network in your container configuration
+
+With macvlan the container gets its own IP separate from the NAS IP. Set SHIM_HOST to the container IP not the NAS IP:
+
+environment:
+  - SHIM_HOST=192.168.0.254
+
+
+If you are unsure which option to use start with Option A. If the speaker cannot reach SLC after configuring in StreamTouch switch to Option B
+
+| Platform | SHIM_HOST value |
+|----------|----------------|
+| Raspberry Pi / Linux | IP of the host device e.g. `192.168.0.100` |
+| Windows / Mac | IP of the host device e.g. `192.168.0.100` |
+| Synology NAS (bridge / port mapping) | IP of the NAS e.g. `192.168.0.252` |
+| Synology NAS (macvlan) | IP assigned to the container e.g. `192.168.0.254` |
+| QNAP NAS (qnet static network) | IP assigned to the container via `--ip` e.g. `192.168.0.254` |  
+
+> **The rule:** SHIM_HOST must be the IP address your speaker
+> will use to reach SLC. Verify by opening a browser on any
+> device and going to `http://[SHIM_HOST]:8300/api/health`
+> — if you see a JSON response the speaker can reach it too.
 
 ---
 
@@ -510,6 +634,52 @@ clear individual slots.
 ---
 
 ## Frequently Asked Questions
+
+### This all sounds very complicated, is it?  
+It depends on what you already have running.
+If you already have Music Assistant running — adding SLC 
+is straightforward. You copy a few files to the same device, edit one
+configuration file with your network details, and run two commands to 
+build and start it. Most users have it working in under 30 minutes.
+
+If you are starting from scratch — there is a bit more to do, Music Assistant
+is well documented and has active communities. The most common setup is
+a Raspberry Pi or a NAS device that you may already have running at home. 
+If it can run Docker it can run both Music Assistant and StreamTouch SLC.
+
+The honest answer — if you are comfortable logging in to your router to check
+connected devices, or have ever set up a NAS or home server, you will find
+this manageable. If those things sound unfamiliar it may take a bit more time
+and reading..
+
+**What you do not need:**
+- Any cloud accounts or subscriptions
+- A developer account or technical background
+- Any changes to your speaker hardware
+
+**What you do need:**
+- A device on your home network that can run Docker and stays powered on
+- a Raspberry Pi, NAS, or any always-on computer works well
+- About 30 to 60 minutes for the initial setup
+
+---
+
+### How do I add content/music streaming sources?
+You add your preferred music sources to Music Assistant Server.
+Access your MA server vi http://**YourMAServerIP**:8095/#/settings.
+Choose your music sources and these will all be available to search/browse
+in StreamTouch.
+
+---
+
+### What about internet radio custom URLs?
+Add custom URLs via http://**YourMAServerIP**:8095/#/radios.
+Click the add/olus button top right and enter custom URL details.
+This will then be avaialble in StreamTouch as a library item.
+If you have SLC running you can save any of these custom URLs to
+a hardware preset.
+
+---
 
 ### Where do I find my speaker's IP address?
 
@@ -711,6 +881,14 @@ duration. iOS may attempt to switch back to your home
 network automatically — if this happens, return to
 iPhone Settings → WiFi and reconnect to the speaker
 network before retrying.
+
+**Connection tests are successful — no playback**
+Following WiFi reconnection or speaker being offline
+the speaker maybe present but unavailable in Music Assistant
+for several minutes before being 'seen' again by Music Assistant.
+Some systems, particulary Wave pedestal systems may require more
+time following WiFi reconnection or power cycle to become avaialble
+to Music Assistant and resume playback via StreamTouch.
 
 ---
 
