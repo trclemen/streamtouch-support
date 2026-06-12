@@ -666,7 +666,7 @@ and reading..
 
 ### How do I add content/music streaming sources?
 You add your preferred music sources to Music Assistant Server.
-Access your MA server vi http://**YourMAServerIP**:8095/#/settings.
+Access your MA server via http://**YourMAServerIP**:8095/#/settings.
 Choose your music sources and these will all be available to search/browse
 in StreamTouch.
 
